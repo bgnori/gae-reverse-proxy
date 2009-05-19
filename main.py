@@ -20,23 +20,25 @@ import wsgiref.handlers
 
 from google.appengine.ext import webapp
 from google.appengine.api import urlfetch
+from google.appengine.api import memcache
 
 cache_related = ('if_match', 'if_modified_since', 'if_none_match', 'if_range', 'if_unmodified_since')
 NETLOC = 'image.backgammonbase.com'
 SCHEME = 'http'
 
-debug = False
-
 class ReverseProxyHandler(webapp.RequestHandler):
   def get(self):
-    scheme, netloc, path, query, fragment = urlparse.urlsplit(self.request.url)
+    u = self.request.url
+    scheme, netloc, path, query, fragment = urlparse.urlsplit(u)
     t = urlparse.urlunsplit((SCHEME, NETLOC, path, query, fragment))
-    if debug:
-      self.response.out.write(t)
-    else:
+    cached = memcache.get(u)
+    if cached is None:
       response = urlfetch.fetch(t)
-      self.response.headers['Content-Type'] = response.headers['Content-Type']
-      self.response.out.write(response.content)
+      memcache.set(u, response)
+      cached = response
+    self.response.headers['Content-Type'] = cached.headers['Content-Type']
+    self.response.out.write(cached.content)
+
 
 def main():
   application = webapp.WSGIApplication([('.*', ReverseProxyHandler)],
