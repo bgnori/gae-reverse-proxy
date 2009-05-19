@@ -15,36 +15,38 @@
 # limitations under the License.
 #
 
-
-
-
+import urlparse
 import wsgiref.handlers
-
-
 
 from google.appengine.ext import webapp
 from google.appengine.api import urlfetch
 
 cache_related = ('if_match', 'if_modified_since', 'if_none_match', 'if_range', 'if_unmodified_since')
+NETLOC = 'image.backgammonbase.com'
+SCHEME = 'http'
 
-class MainHandler(webapp.RequestHandler):
+debug = False
+
+class ReverseProxyHandler(webapp.RequestHandler):
 
   def get(self):
-    response = urlfetch.fetch('http://image.backgammonbase.com/image'
-                              '?gnubgid=4HPwATDgc%2FABMA%3AMAAAAAAAAAAA'
-                              '&height=300'
-                              '&width=400'
-                              '&css=minimal'
-                              '&format=png')
-    self.response.headers['Content-Type'] = response.headers['Content-Type']
-    self.response.out.write(response.content)
+    scheme, netloc, path, query, fragment = urlparse.urlsplit(self.request.url)
+    t = urlparse.urlunsplit((SCHEME, NETLOC, path, query, fragment))
+    if debug:
+      self.response.out.write(t)
+    else:
+      response = urlfetch.fetch(t)
+      self.response.headers['Content-Type'] = response.headers['Content-Type']
+      self.response.out.write(response.content)
 
 
 def main():
-  application = webapp.WSGIApplication([('/', MainHandler)],
+  application = webapp.WSGIApplication([('.*', ReverseProxyHandler)],
                                        debug=True)
   wsgiref.handlers.CGIHandler().run(application)
 
 
 if __name__ == '__main__':
   main()
+
+
