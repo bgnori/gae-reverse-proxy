@@ -28,7 +28,6 @@ SCHEME = 'http'
 debug = False
 
 class ReverseProxyHandler(webapp.RequestHandler):
-
   def get(self):
     scheme, netloc, path, query, fragment = urlparse.urlsplit(self.request.url)
     t = urlparse.urlunsplit((SCHEME, NETLOC, path, query, fragment))
@@ -39,7 +38,6 @@ class ReverseProxyHandler(webapp.RequestHandler):
       self.response.headers['Content-Type'] = response.headers['Content-Type']
       self.response.out.write(response.content)
 
-
 def main():
   application = webapp.WSGIApplication([('.*', ReverseProxyHandler)],
                                        debug=True)
@@ -48,5 +46,4 @@ def main():
 
 if __name__ == '__main__':
   main()
-
 
