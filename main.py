@@ -30,7 +30,12 @@ cache_related = ('if_match', 'if_modified_since', 'if_none_match', 'if_range', '
 class MainHandler(webapp.RequestHandler):
 
   def get(self):
-    response = urlfetch.fetch('http://image.backgammonbase.com/image?gnubgid=4HPwATDgc%2FABMA%3AMAAAAAAAAAAA&height=300&width=400&css=minimal&format=png')
+    response = urlfetch.fetch('http://image.backgammonbase.com/image'
+                              '?gnubgid=4HPwATDgc%2FABMA%3AMAAAAAAAAAAA'
+                              '&height=300'
+                              '&width=400'
+                              '&css=minimal'
+                              '&format=png')
     self.response.headers['Content-Type'] = response.headers['Content-Type']
     self.response.out.write(response.content)
 
