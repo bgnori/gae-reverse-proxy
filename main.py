@@ -34,6 +34,7 @@ class ReverseProxyHandler(webapp.RequestHandler):
     cached = memcache.get(u)
     if cached is None:
       response = urlfetch.fetch(t)
+      expires = response.headers['Expires']
       memcache.set(u, response)
       cached = response
     self.response.headers['Content-Type'] = cached.headers['Content-Type']
