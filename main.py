@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 #
-# Copyright 2007 Google Inc.
+# Copyright:
+#  Noriyuki Hosaka bgnori@gmail.com
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,7 +16,6 @@
 # limitations under the License.
 #
 
-import sys
 import urlparse
 import wsgiref.handlers
 
@@ -23,10 +23,10 @@ from google.appengine.ext import webapp
 from google.appengine.api import urlfetch
 from google.appengine.api import memcache
 
-cache_related = ('if_match', 'if_modified_since', 'if_none_match', 'if_range', 'if_unmodified_since')
+from config import NETLOC, HOST, SCHEME
 
 '''
-http://code.google.com/intl/ja/appengine/docs/webapp/responseclass.html#Disallowed_HTTP_Response_Headers
+  This list came from http://code.google.com/intl/ja/appengine/docs/webapp/responseclass.html#Disallowed_HTTP_Response_Headers
 '''
 PROHIBTED_BY_GAE = ('Content-Encoding', 
                     'Content-Length', 
@@ -34,14 +34,12 @@ PROHIBTED_BY_GAE = ('Content-Encoding',
                     'Server',
                     'Transfer-Encoding')
 
-PROHIBTED_IN_ENTITYLESS = PROHIBTED_BY_GAE + ('Content-Type', )
+'''
+  statuses of Resopnse cannot have entity  
+'''
+PROHIBTED_IN_ENTITYLESS = ('Content-Type', )
 ENTITYLESS_STATUS = (204, 205, 304)
 
-#NETLOC = 'image.backgammonbase.com'
-#NETLOC = '127.0.0.1'
-NETLOC = '192.168.2.64'
-HOST = 'image.backgammonbase.com'
-SCHEME = 'http'
 
 
 class ReverseProxyHandler(webapp.RequestHandler):
@@ -52,7 +50,7 @@ class ReverseProxyHandler(webapp.RequestHandler):
       self.response.headers[key] = src.headers[key]
 
     if status in ENTITYLESS_STATUS:
-      for key in PROHIBTED_IN_ENTITYLESS:
+      for key in PROHIBTED_IN_ENTITYLESS + PROHIBTED_BY_GAE:
         del self.response.headers[key]
     else:
       self.response.out.write(src.content)
