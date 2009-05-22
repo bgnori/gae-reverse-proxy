@@ -23,7 +23,7 @@ from webtest import TestApp
 from google.appengine.ext import webapp
 from google.appengine.api import memcache
 from main import rfc1123toEpoch 
-from main import ReverseProxyHandler
+from main import HandlerFactory
 
 #FIXME 
 #  this test code expects that http://image.backgammonbase.com as the orogin server.
@@ -42,14 +42,33 @@ def test_rfc1123toEpoch():
   except ValueError:
     assert True
 
+class etagHandler(webapp.RequestHandler):
+  pass
 
+class pngHandler(webapp.RequestHandler):
+  pass
+class jpegHandler(webapp.RequestHandler):
+  pass
 
 class HandlerTest(unittest.TestCase):
   def setUp(self):
     self.app = TestApp(
-                   webapp.WSGIApplication([('.*', ReverseProxyHandler)],
+                   webapp.WSGIApplication([('.*', HandlerFactory(
+                                                    'http',
+                                                    '192.168.2.64',
+                                                    'image.backgammonbase.com')
+                   
+                                                  )],
                                        debug=True)
                    )
+    self.testserv = TestApp(
+                   webapp.WSGIApplication([('/etag', etagHandler),
+                                           ('/png', pngHandler),
+                                           ('/jpeg', jpegHandler)],
+                                         )
+                   )
+                   
+
   def tearDown(self):
     memcache.flush_all()
     del self.app
