@@ -22,9 +22,26 @@ from webtest import TestApp
 
 from google.appengine.ext import webapp
 from google.appengine.api import memcache
+from main import rfc1123toEpoch 
 from main import ReverseProxyHandler
 
-#class CCTest(unittest.TestCase):
+#FIXME 
+#  this test code expects that http://image.backgammonbase.com as the orogin server.
+
+def test_rfc1123toEpoch():
+  try:
+    t = rfc1123toEpoch('Wed, 22 Oct 2008 10:52:40 GMT')
+    assert True
+    assert isinstance(t, (int, float))
+  except:
+    assert False
+
+  try:
+    t = rfc1123toEpoch('10:52:40 GMT')
+    assert False
+  except ValueError:
+    assert True
+
 
 
 class HandlerTest(unittest.TestCase):
@@ -75,6 +92,32 @@ class HandlerTest(unittest.TestCase):
     print response.status
     print response.headers
     assert response.headers['Content-Type'] == 'image/png'
+
+  def test_etagless_client(self):
+    response = self.app.get(('/image'
+                     '?gnubgid=4HPwATDgc%2FABMA%3AMAAAAAAAAAAA'
+                     '&height=300'
+                     '&width=400'
+                     '&css=minimal'
+                     '&format=png'),
+                      )
+    print 'first response (populated memcache)'
+    print response.status
+    print response.headers
+    print response.headers['etag']
+    assert response.status.startswith('200')
+    assert response.headers['Content-Type'] == 'image/png'
+    response = self.app.get(('/image'
+                     '?gnubgid=4HPwATDgc%2FABMA%3AMAAAAAAAAAAA'
+                     '&height=300'
+                     '&width=400'
+                     '&css=minimal'
+                     '&format=png'),
+                     )
+    print 'second response'
+    print response.status
+    print response.headers
+    assert response.status.startswith('200')
 
   def test_etag_match(self):
     response = self.app.get(('/image'

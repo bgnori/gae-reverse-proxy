@@ -16,6 +16,7 @@
 # limitations under the License.
 #
 
+import time
 import urlparse
 import wsgiref.handlers
 
@@ -41,6 +42,9 @@ PROHIBTED_IN_ENTITYLESS = ('Content-Type', )
 ENTITYLESS_STATUS = (204, 205, 304)
 
 
+RFC1123FORMAT = '%a, %d %b %Y %H:%M:%S GMT'
+def rfc1123toEpoch(s):
+  return time.mktime(time.strptime(s, RFC1123FORMAT))
 
 class ReverseProxyHandler(webapp.RequestHandler):
   def relay_response(self, src, status):
@@ -57,20 +61,49 @@ class ReverseProxyHandler(webapp.RequestHandler):
       for key in PROHIBTED_BY_GAE:
         del self.response.headers[key]
 
+  def set_cache(self, url, response):
+    try:
+      expires = rfc1123toEpoch(response.headers['expires'])
+    except ValueError:
+      expires = None
+    memcache.set(url, response, time=expires)
+
+  def get_cache(self, url):
+    return memcache.get(url)
+
   def get(self):
     u = self.request.url
     scheme, netloc, path, query, fragment = urlparse.urlsplit(u)
     t = urlparse.urlunsplit((SCHEME, NETLOC, path, query, fragment))
     if_none_match = self.request.headers.get('If-None-Match', None)
-    cached = memcache.get(u)
+    cached = self.get_cache(u)
     if cached is None:
       r = urlfetch.fetch(t, 
             headers={'host': HOST}
             )
       assert r.status_code == 200
-      memcache.set(u, r)
+      self.set_cache(u, r)
       self.relay_response(r, 200)
       return
+
+    elif cached is not None and if_none_match is None:
+      r = urlfetch.fetch(t, 
+          headers={
+#            'If-Modified-Since': cached.headers['date'],
+            'If-None-Match': cached.headers['etag'],
+            'host': HOST
+          }
+          )
+      if r.status_code == 200:
+        self.set_cache(u, r)
+        self.relay_response(r, 200)
+        return
+      elif r.status_code == 304:
+        self.relay_response(cached, status=200)
+        return
+      else:
+        assert False
+
     elif (if_none_match and
           (cached.headers['etag'] == if_none_match)):
       r = urlfetch.fetch(t, 
@@ -81,14 +114,11 @@ class ReverseProxyHandler(webapp.RequestHandler):
           }
           )
       if r.status_code == 200:
-        memcache.set(u, r)
+        self.set_cache(u, r)
         self.relay_response(r, 200)
         return
       elif r.status_code == 304:
-        if if_none_match is not None:
-          self.relay_response(r, status=304)
-        else:
-          self.relay_response(cached, status=200)
+        self.relay_response(r, status=304)
         return
       else:
         assert False
@@ -98,7 +128,7 @@ class ReverseProxyHandler(webapp.RequestHandler):
             headers={'host': HOST}
             )
       assert r.status_code == 200
-      memcache.set(u, r)
+      self.set_cache(u, r)
       self.relay_response(r, 200)
       return
     else:

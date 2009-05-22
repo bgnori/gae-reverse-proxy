@@ -1,3 +1,7 @@
+#!/usr/bin/env python
+# 
+# this is configuration file for reverse proxy.
+# you need to tell application where is the origin server.
 
 
 NETLOC = '192.168.2.64'
