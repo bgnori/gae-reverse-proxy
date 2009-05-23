@@ -4,7 +4,8 @@
 # you need to tell application where is the origin server.
 
 
-NETLOC = '192.168.2.64'
+#NETLOC = '192.168.2.64'
+NETLOC = 'image.backgammonbase.com'
 '''
   netloc of origin server.
 '''

@@ -42,30 +42,17 @@ def test_rfc1123toEpoch():
   except ValueError:
     assert True
 
-class etagHandler(webapp.RequestHandler):
-  pass
-
-class pngHandler(webapp.RequestHandler):
-  pass
-class jpegHandler(webapp.RequestHandler):
-  pass
 
 class HandlerTest(unittest.TestCase):
   def setUp(self):
     self.app = TestApp(
                    webapp.WSGIApplication([('.*', HandlerFactory(
                                                     'http',
-                                                    '192.168.2.64',
+                                                    'localhost:8001',
                                                     'image.backgammonbase.com')
                    
                                                   )],
                                        debug=True)
-                   )
-    self.testserv = TestApp(
-                   webapp.WSGIApplication([('/etag', etagHandler),
-                                           ('/png', pngHandler),
-                                           ('/jpeg', jpegHandler)],
-                                         )
                    )
                    
 
