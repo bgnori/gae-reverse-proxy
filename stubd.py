@@ -70,9 +70,7 @@ def stubd(environ, start_response):
         print >>stdout, k,'=',`v`
    
     method = environ["REQUEST_METHOD"]
-    path = environ["PATH_INFO"]
-    query = environ["QUERY_STRING"]
-    d = cgi.parse_qs(query)
+    d = cgi.parse_qs(environ['HTTP_X_TESTING'])
 
     status = d.get('status', DEFAULT_STATUS)[0] #FIXME
 

@@ -76,7 +76,10 @@ def HandlerFactory(orig_scheme, orgi_netloc, orig_host):
       cached = self.get_cache(u)
       if cached is None:
         r = urlfetch.fetch(t, 
-              headers={'host': orig_host}
+              headers={
+                'host': orig_host,
+                'X-Testing': self.request.headers['X-Testing'],
+              },
               )
         assert r.status_code == 200
         self.set_cache(u, r)
@@ -88,7 +91,8 @@ def HandlerFactory(orig_scheme, orgi_netloc, orig_host):
             headers={
   #            'If-Modified-Since': cached.headers['date'],
               'If-None-Match': cached.headers['etag'],
-              'host': orig_host
+              'host': orig_host,
+              'X-Testing': self.request.headers['X-Testing'],
             }
             )
         if r.status_code == 200:
@@ -107,7 +111,8 @@ def HandlerFactory(orig_scheme, orgi_netloc, orig_host):
             headers={
   #            'If-Modified-Since': cached.headers['date'],
               'If-None-Match': cached.headers['etag'],
-              'host': orig_host
+              'host': orig_host,
+              'X-Testing': self.request.headers['X-Testing'],
             }
             )
         if r.status_code == 200:
@@ -122,7 +127,10 @@ def HandlerFactory(orig_scheme, orgi_netloc, orig_host):
       elif (if_none_match and 
             (cached.headers['etag'] != if_none_match)):
         r = urlfetch.fetch(t, 
-              headers={'host': orig_host}
+              headers={
+                'host': orig_host,
+                'X-Testing': self.request.headers['X-Testing'],
+              }
               )
         assert r.status_code == 200
         self.set_cache(u, r)

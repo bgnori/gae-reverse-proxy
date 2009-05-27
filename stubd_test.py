@@ -30,7 +30,12 @@ class StubdTest(unittest.TestCase):
     pass
 
   def test_default(self):
-    response = self.app.get('/', status=200)
+    response = self.app.get(
+        '/',
+        headers={
+            'X-Testing': ''
+        },
+        )
 
     print response.status
     print response.headers
@@ -39,9 +44,12 @@ class StubdTest(unittest.TestCase):
 
   def test_status201(self):
     response = self.app.get(
-        '/?'+ urlencode({
-                'status': '201 OK',
-              }),
+        '/',
+        headers={
+            'X-Testing': urlencode({
+                 'status': '201 OK',
+                }),
+        },
         status=201)
 
     print response.status
@@ -51,10 +59,13 @@ class StubdTest(unittest.TestCase):
 
   def test_status201_contenttype(self):
     response = self.app.get(
-        '/?'+ urlencode({
+        '/',
+        headers={
+            'X-Testing': urlencode({
                 'status': '201 OK',
                 'Content-Type':'text/css', 
-              }),
+                }),
+        },
         status=201)
     print response.status
     print response.headers
@@ -63,9 +74,12 @@ class StubdTest(unittest.TestCase):
 
   def test_contenttype(self):
     response = self.app.get(
-        '/?'+ urlencode({
+        '/',
+        headers={
+            'X-Testing': urlencode({
                 'Content-Type':'text/html', 
-              }),
+                }),
+        },
         status=200)
     print response.status
     print response.headers
@@ -76,10 +90,16 @@ class StubdTest(unittest.TestCase):
     for h in stubd.HTTP_HEADERS:
       if h in stubd.PROHIBTED:
         continue
-      response = self.app.get("/?%s=hoge"%(h,), status=200)
+      response = self.app.get(
+        '/',
+        headers={
+            'X-Testing': urlencode({
+                h:'hoge',
+                }),
+        },
+        status=200)
       print response.status
       print response.headers
       print response.body
       assert response.headers[h] == 'hoge'
-
 

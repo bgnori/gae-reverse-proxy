@@ -50,9 +50,12 @@ class HandlerTest(unittest.TestCase):
 
   def test_status200_vanilla(self):
     response = self.app.get(
-        '/?'+ urlencode({
-                'status': '200 OK',
-              }),
+        '/',
+        headers={
+            'X-Testing': urlencode({
+                 'status': '200 OK',
+                }),
+        },
         )
     print response.status
     print response.headers
@@ -61,74 +64,128 @@ class HandlerTest(unittest.TestCase):
   def test_status200_Expire(self):
     expires = Epoch_to_rfc1123(time.time() + 1000)
     response = self.app.get(
-        '/?'+ urlencode({
-                'status': '201 OK',
-                'Expires':expires,
-              }),
-        status=201)
+        '/',
+        headers={
+            'X-Testing': urlencode({
+                 'status': '200 OK',
+                 'Expires':expires,
+                }),
+        },
+        status=200)
     print response.status
     print response.headers
     assert response.status.startswith('200')
 
   def test_contenttype_jpeg(self):
-    response = self.app.get('/?Content-Type=image/jpeg',
-                     status=200
-                     )
+    response = self.app.get(
+        '/',
+        headers={
+            'X-Testing': urlencode({
+                 'status': '200 OK',
+                 'Content-Type': 'image/jpeg',
+                }),
+        },
+        )
+    print response.status
+    print response.headers
     assert response.headers['Content-Type'] == 'image/jpeg'
+    assert response.status.startswith('200')
 
   def test_etagless_client(self):
-
-    response = self.app.get('/?ETag=1&Expires=%s'%(Epoch_to_rfc1123(time.time() + 1000)))
+    expires = Epoch_to_rfc1123(time.time() + 1000)
+    response = self.app.get(
+        '/',
+        headers={
+            'X-Testing': urlencode({
+                'status': '200 OK',
+                'Expires':expires,
+                'ETag': '1'
+                }),
+        },
+        status=200)
     print 'first response (populated memcache)'
     print response.status
     print response.headers
     assert response.status.startswith('200')
-    response = self.app.get('/?ETag=2')
+
+    response = self.app.get(
+        '/',
+        headers={
+            'X-Testing': urlencode({
+                'status': '200 OK',
+                'Expires':expires,
+                'ETag': '2'
+                }),
+        },
+        status=200)
     print 'second response'
     print response.status
     print response.headers
     assert response.status.startswith('200')
 
   def test_etag_match(self):
-    response = self.app.get('/?ETag=1')
+    expires = Epoch_to_rfc1123(time.time() + 1000)
+    response = self.app.get(
+        '/',
+        headers={
+            'X-Testing': urlencode({
+                'status': '200 OK',
+                'Expires':expires,
+                'ETag': '1'
+                }),
+        },
+        )
     print 'first response (populated memcache)'
     print response.status
     print response.headers
     print response.headers['etag']
     assert response.status.startswith('200')
-    response = self.app.get('/?ETag=1',
-                     headers={
-                        'If-None-Match': response.headers['etag'],
-                          },
-                     )
+
+    response = self.app.get(
+        '/',
+        headers={
+            'If-None-Match': response.headers['etag'],
+            'X-Testing': urlencode({
+                'status': '200 OK',
+                'Expires':expires,
+                'ETag': '1'
+                }),
+        },
+        )
     print 'second response'
     print response.status
     print response.headers
     assert response.status.startswith('304')
 
   def test_etag_mismatch(self):
-    response = self.app.get(('/image'
-                     '?gnubgid=4HPwATDgc%2FABMA%3AMAAAAAAAAAAA'
-                     '&height=300'
-                     '&width=400'
-                     '&css=minimal'
-                     '&format=png'),
-                     status=200
-                      )
+    expires = Epoch_to_rfc1123(time.time() + 1000)
+    response = self.app.get(
+        '/',
+        headers={
+            'X-Testing': urlencode({
+                'status': '200 OK',
+                'Expires':expires,
+                'ETag': '1'
+                }),
+        },
+        status=200)
     print 'first response (populated memcache)'
     print response.status
     print response.headers
-    assert response.headers['Content-Type'] == 'image/png'
-    response = self.app.get(('/image'
-                     '?gnubgid=4HPwATDgc%2FABMA%3AMAAAAAAAAAAA'
-                     '&height=300'
-                     '&width=400'
-                     '&css=minimal'
-                     '&format=png'),
-                     headers={
-                        'If-None-Match': 'some_thing_invalid'
-                          },
-                     )
+    print response.headers['etag']
+    assert response.status.startswith('200')
+
+    response = self.app.get(
+        '/',
+        headers={
+            'If-None-Match': 'some_thing_invalid',
+            'X-Testing': urlencode({
+                'status': '200 OK',
+                'Expires':expires,
+                'ETag': '1'
+                }),
+        },
+        )
     print 'second response'
     print response.status
     print response.headers
