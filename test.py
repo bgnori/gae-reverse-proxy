@@ -146,7 +146,7 @@ class HandlerTest(unittest.TestCase):
         headers={
             'If-None-Match': response.headers['etag'],
             'X-Testing': urlencode({
-                'status': '200 OK',
+                'status': '304 OK',
                 'Expires':expires,
                 'ETag': '1'
                 }),
