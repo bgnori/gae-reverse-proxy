@@ -16,7 +16,6 @@
 # limitations under the License.
 #
 
-import time
 import urlparse
 import wsgiref.handlers
 
@@ -25,6 +24,7 @@ from google.appengine.api import urlfetch
 from google.appengine.api import memcache
 
 from config import NETLOC, HOST, SCHEME
+from util import rfc1123_to_Epoch
 
 '''
   This list came from http://code.google.com/intl/ja/appengine/docs/webapp/responseclass.html#Disallowed_HTTP_Response_Headers
@@ -41,10 +41,6 @@ PROHIBTED_BY_GAE = ('Content-Encoding',
 PROHIBTED_IN_ENTITYLESS = ('Content-Type', )
 ENTITYLESS_STATUS = (204, 205, 304)
 
-
-RFC1123FORMAT = '%a, %d %b %Y %H:%M:%S GMT'
-def rfc1123toEpoch(s):
-  return time.mktime(time.strptime(s, RFC1123FORMAT))
 
 def HandlerFactory(orig_scheme, orgi_netloc, orig_host):
   class ReverseProxyHandler(webapp.RequestHandler):
@@ -64,10 +60,10 @@ def HandlerFactory(orig_scheme, orgi_netloc, orig_host):
   
     def set_cache(self, url, response):
       try:
-        expires = rfc1123toEpoch(response.headers['expires'])
-      except ValueError:
-        expires = None
-      memcache.set(url, response, time=expires)
+        expires = rfc1123_to_Epoch(response.headers['expires'])
+        memcache.set(url, response, time=expires)
+      except (KeyError, ValueError):
+        memcache.set(url, response)
   
     def get_cache(self, url):
       return memcache.get(url)
