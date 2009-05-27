@@ -3,22 +3,29 @@
 from wsgiref.simple_server import make_server
 from wsgiref.simple_server import demo_app
 from wsgiref.handlers import SimpleHandler
+from StringIO import StringIO
 
-class etagHandler(SimpleHandler):
-  pass
-class pngHandler(SimpleHandler):
-  pass
-class jpegHandler(SimpleHandler):
-  pass
+def application(environ, start_response):
+    stdout = StringIO()
+    h = environ.items(); h.sort()
+    for k,v in h:
+        print >>stdout, k,'=',`v`
 
-#application = webapp.WSGIApplication([('/etag', etagHandler),
-#                                      ('/png', pngHandler),
-#                                      ('/jpeg', jpegHandler)],
-#                                         )
-#httpd = make_server("localhost", 8001, application)
-httpd = make_server("", 8001, demo_app)
+   
+    method = environ["REQUEST_METHOD"]
+    path = environ["PATH_INFO"]
+    query = environ["QUERY_STRING"]
+
+    start_response("200 OK", [('Content-Type','text/plain')])
+    return [stdout.getvalue()]
+   
+httpd = make_server("", 8001, application)
 
 if __name__ == "__main__":
-  print "starting ..."
-  httpd.serve_forever()
+  print "self testing..."
+  from urllib import urlopen
+  #httpd.serve_forever()
+  h = urlopen("http://localhost:8001/")
+  httpd.handle_request()
+  h.read()
 

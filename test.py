@@ -49,7 +49,7 @@ class HandlerTest(unittest.TestCase):
                    webapp.WSGIApplication([('.*', HandlerFactory(
                                                     'http',
                                                     'localhost:8001',
-                                                    'image.backgammonbase.com')
+                                                    '')
                    
                                                   )],
                                        debug=True)
