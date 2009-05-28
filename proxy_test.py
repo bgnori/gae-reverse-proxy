@@ -26,7 +26,7 @@ from webtest import TestApp
 from google.appengine.ext import webapp
 from google.appengine.api import memcache
 from util import Epoch_to_rfc1123
-from main import HandlerFactory
+from proxy import HandlerFactory
 
 #FIXME 
 #  this test code expects that http://image.backgammonbase.com as the orogin server.
