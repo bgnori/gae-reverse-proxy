@@ -21,6 +21,7 @@ import unittest
 
 from webtest import TestApp
 import stubd
+import httphdr
 
 class StubdTest(unittest.TestCase):
   def setUp(self):
@@ -87,7 +88,7 @@ class StubdTest(unittest.TestCase):
     assert response.headers['Content-Type'] == 'text/html'
 
   def test_headerx(self):
-    for h in stubd.HTTP_HEADERS:
+    for h in httphdr.RESPONSE_HEADERS:
       if h in stubd.PROHIBTED:
         continue
       response = self.app.get(

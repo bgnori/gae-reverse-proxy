@@ -26,6 +26,7 @@ from webtest import TestApp
 from google.appengine.ext import webapp
 from google.appengine.api import memcache
 from util import Epoch_to_rfc1123
+from httphdr import REQUEST_HEADERS
 from proxy import HandlerFactory
 
 #FIXME 
@@ -190,4 +191,23 @@ class HandlerTest(unittest.TestCase):
     print response.status
     print response.headers
     assert response.status.startswith('200')
+
+
+  def test_headerpass_through(self):
+    for h in REQUEST_HEADERS:
+      response = self.app.get(
+        '/',
+        headers={
+            'X-Testing': urlencode({
+                'status': '200 OK',
+                h: '1',
+                }),
+        },
+        )
+      print h
+      print response.status
+      print response.headers
+      assert response.status.startswith('200')
+
+
 

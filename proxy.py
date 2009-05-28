@@ -87,14 +87,21 @@ def HandlerFactory(orig_scheme, orgi_netloc, orig_host):
         return
   
       elif cached is not None and if_none_match is None:
-        r = urlfetch.fetch(t, 
-            headers={
-  #            'If-Modified-Since': cached.headers['date'],
-              'If-None-Match': cached.headers['etag'],
-              'host': orig_host,
-              'X-Testing': self.request.headers['X-Testing'],
-            }
-            )
+        if 'etag' in cached.headers:
+          r = urlfetch.fetch(t, 
+              headers={
+                'host': orig_host,
+                'If-None-Match': cached.headers['etag'],
+                'X-Testing': self.request.headers['X-Testing'],
+              }
+              )
+        else:
+          r = urlfetch.fetch(t, 
+              headers={
+                'host': orig_host,
+                'X-Testing': self.request.headers['X-Testing'],
+              }
+              )
         if r.status_code == 200:
           self.set_cache(u, r)
           self.relay_response(r, 200)
@@ -140,6 +147,5 @@ def HandlerFactory(orig_scheme, orgi_netloc, orig_host):
         pass
       assert False
   return ReverseProxyHandler
-
 
 
