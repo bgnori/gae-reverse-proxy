@@ -77,8 +77,8 @@ def HandlerFactory(orig_scheme, orgi_netloc, orig_host):
       if cached is None:
         r = urlfetch.fetch(t, 
               headers={
-                'host': orig_host,
-                'X-Testing': self.request.headers['X-Testing'],
+                'Host': orig_host,
+                'X-Testing': self.request.headers.get('X-Testing', None)
               },
               )
         assert r.status_code == 200
@@ -90,16 +90,16 @@ def HandlerFactory(orig_scheme, orgi_netloc, orig_host):
         if 'etag' in cached.headers:
           r = urlfetch.fetch(t, 
               headers={
-                'host': orig_host,
+                'Host': orig_host,
                 'If-None-Match': cached.headers['etag'],
-                'X-Testing': self.request.headers['X-Testing'],
+                'X-Testing': self.request.headers.get('X-Testing', None)
               }
               )
         else:
           r = urlfetch.fetch(t, 
               headers={
-                'host': orig_host,
-                'X-Testing': self.request.headers['X-Testing'],
+                'Host': orig_host,
+                'X-Testing': self.request.headers.get('X-Testing', None)
               }
               )
         if r.status_code == 200:
@@ -118,8 +118,8 @@ def HandlerFactory(orig_scheme, orgi_netloc, orig_host):
             headers={
   #            'If-Modified-Since': cached.headers['date'],
               'If-None-Match': cached.headers['etag'],
-              'host': orig_host,
-              'X-Testing': self.request.headers['X-Testing'],
+              'Host': orig_host,
+              'X-Testing': self.request.headers.get('X-Testing', None)
             }
             )
         if r.status_code == 200:
@@ -135,8 +135,8 @@ def HandlerFactory(orig_scheme, orgi_netloc, orig_host):
             (cached.headers['etag'] != if_none_match)):
         r = urlfetch.fetch(t, 
               headers={
-                'host': orig_host,
-                'X-Testing': self.request.headers['X-Testing'],
+                'Host': orig_host,
+                'X-Testing': self.request.headers.get('X-Testing', None)
               }
               )
         assert r.status_code == 200
