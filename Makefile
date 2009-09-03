@@ -4,34 +4,27 @@ NOSE = nosetests-2.5
 GAE_LIB_ROOT = /home/nori/Desktop/work/gae/google_appengine
 NAME = proxy
 USER = usr
-SRCDIR = src
-BUILDDIR = build
 
 
-all: app
+all: build
 
-app: source
-
-source: build $(USER)
-	cp $(SRCDIR)/*py $(BUILDDIR)
-	cp $(SRCDIR)/*yaml $(BUILDDIR)
-	$(PYTHON) util/mergeyaml.py $(SRCDIR)/app.yaml.template $(USER)/app.yaml > $(BUILDDIR)/app.yaml
-
-
-build:
-	-mkdir -p $(BUILDDIR)
+build: $(USER)
+	-mkdir -p build
+	cp src/*py build
+	$(PYTHON) util/mergeyaml.py src/app.yaml.template $(USER)/app.yaml > build/app.yaml
+	$(PYTHON) util/mergeyaml.py src/cron.yaml.template $(USER)/cron.yaml > build/cron.yaml
 
 start_dev_server:
-	$(PYTHON) $(GAE_LIB_ROOT)/dev_appserver.py $(BUILDDIR)
+	$(PYTHON) $(GAE_LIB_ROOT)/dev_appserver.py build
 
 start_stubd:
 	$(PYTHON) util/stubd.py localhost 8001
 
-test: app
+test: build
 	$(NOSE) \
     --with-gae \
     --gae-lib-root=$(GAE_LIB_ROOT) \
-    --gae-application=$(BUILDDIR) \
+    --gae-application=build \
     tests
 #   --gae-datastore=$(DATASTORE) 
 #    -x \
@@ -43,9 +36,12 @@ unittest:
     tests
 
 clean:
-	-rm -rf $(BUILDDIR)
+	-rm -rf build
+	-rm  $(USER)/*pyc
+	-rm  tests/*pyc
+	-rm  src/*pyc
+	-rm  lib/*pyc
 
 install: app
-	$(PYTHON) $(GAE_LIB_ROOT)/appcfg.py update $(BUILDDIR)
-
+	$(PYTHON) $(GAE_LIB_ROOT)/appcfg.py update build
 

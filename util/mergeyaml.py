@@ -19,7 +19,7 @@ if __name__ == "__main__":
 
     f = open(sys.argv[2])
     try:
-      usr = load(f, Loader=Loader)
+      usr = load(f, Loader=Loader) or []
     finally:
       f.close()
 

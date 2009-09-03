@@ -16,8 +16,8 @@
 # limitations under the License.
 #
 
-from util import rfc1123_to_Epoch 
-from util import Epoch_to_rfc1123 
+from lib.util import rfc1123_to_Epoch 
+from lib.util import Epoch_to_rfc1123 
 
 def test_rfc1123_to_Epoch_good():
   try:

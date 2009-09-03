@@ -20,12 +20,12 @@ from urllib import urlencode
 import unittest
 
 from webtest import TestApp
-import stubd
 import httphdr
+import lib.stubd
 
 class StubdTest(unittest.TestCase):
   def setUp(self):
-    self.app = TestApp(stubd.stubd)
+    self.app = TestApp(lib.stubd.stubd)
 
   def tearDown(self):
     pass
@@ -89,7 +89,7 @@ class StubdTest(unittest.TestCase):
 
   def test_headerx(self):
     for h in httphdr.RESPONSE_HEADERS:
-      if h in stubd.PROHIBTED:
+      if h in lib.stubd.PROHIBTED:
         continue
       response = self.app.get(
         '/',

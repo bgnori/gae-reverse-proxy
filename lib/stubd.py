@@ -24,52 +24,38 @@ from wsgiref.simple_server import demo_app
 from wsgiref.handlers import SimpleHandler
 
 from lib.httphdr import RESPONSE_HEADERS
-from lib.stubd import *
 
+DEFAULT_STATUS = ('200 OK',)
+PROHIBTED = ('Content-Encoding', 
+             'Content-Length', 
+             'Transfer-Encoding')
+
+DEFAULT_HEADER_VALUES = {
+    'Content-Type':['text/plain'],
+    }
+
+def stubd(environ, start_response):
+    stdout = StringIO()
+    h = environ.items(); h.sort()
+    for k,v in h:
+        print >>stdout, k,'=',`v`
    
-import sys
-import os
-import re
-from subprocess import call
-from tempfile import TemporaryFile
+    method = environ["REQUEST_METHOD"]
+    d = cgi.parse_qs(environ['HTTP_X_TESTING'])
 
-PIDFILE = 'stubd.pid'
+    status = d.get('status', DEFAULT_STATUS)[0] #FIXME
 
-try:
-  f = open(PIDFILE, 'r')
-except:
-  f = None
-  pass
-if f:
-  r = TemporaryFile() 
-  call(['ps', 'e'], stdout=r)
-  r.seek(0)
-  x = r.read()
-  y = f.read()
-  print x
-  print 'pid in pid file:', y
-  mo = re.search(' *%s'%y, x)
-  if mo is None:
-    f.close()
-    #r.close()
-    print 'found stale pid file. removing.'
-    os.remove(PIDFILE)
+    headers = [] 
+    for h in RESPONSE_HEADERS:
+      if h in PROHIBTED:
+        continue
+      v = d.get(h, None)
+      if v is None:
+        v = DEFAULT_HEADER_VALUES.get(h)
+      if v is None:
+        continue
+      headers.append((h, v[0]))#FIXME
 
-  else:
-    #alive
-    print 'already running'
-    f.close()
-    #r.close()
-    sys.exit()
-
-f = open(PIDFILE, 'w')
-f.write('%i'%(os.getpid(),))
-f.close()
-
-print 'serving at %s, %i'%(sys.argv[1], int(sys.argv[2]))
-httpd = make_server(sys.argv[1], int(sys.argv[2]), stubd)
-try:
-  httpd.serve_forever()
-finally:
-  os.remove(PIDFILE)
+    start_response(status, headers)
+    return [stdout.getvalue()]
 
