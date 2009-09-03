@@ -26,7 +26,7 @@ start_dev_server:
 	$(PYTHON) $(GAE_LIB_ROOT)/dev_appserver.py $(BUILDDIR)
 
 start_stubd:
-	$(PYTHON) tests/stubd.py
+	$(PYTHON) util/stubd.py localhost 8001
 
 test: build
 	$(NOSE) \
@@ -36,6 +36,12 @@ test: build
     tests
 #   --gae-datastore=$(DATASTORE) 
 #    -x \
+
+unittest:
+	$(NOSE) \
+    --with-gae \
+    --gae-lib-root=$(GAE_LIB_ROOT) \
+    tests
 
 clean:
 	-rm -rf $(BUILDDIR)
