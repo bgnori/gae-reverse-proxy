@@ -29,11 +29,9 @@ test: build
 #   --gae-datastore=$(DATASTORE) 
 #    -x \
 
-unittest:
-	$(NOSE) \
-    --with-gae \
-    --gae-lib-root=$(GAE_LIB_ROOT) \
-    tests
+crawl:
+	$(PYTHON) util/crawl.py $(USER)/crawl.yaml 
+
 
 clean:
 	-rm -rf build

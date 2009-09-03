@@ -45,3 +45,23 @@ it blocks. I recommend to open another terminal.
 2) evoke test.
 % make test
 
+
+How to collect info from existing sites:
+========================================
+1) specify sites and there entry points by editing crawl.yaml in usr/
+something like:
+
+- name: www.google.com
+  url: 
+    - http://www.google.com/
+    - http://www.google.co.jp/
+
+- name: www.yahoo.com
+  url: 
+    - http://www.yahoo.com/
+
+2) invoke crawler. it may teke long time. :P
+% make crawl
+
+3)
+
