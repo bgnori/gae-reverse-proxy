@@ -1,0 +1,35 @@
+
+
+
+
+
+operating
+ http://www.sample.com
+
+source servers.
+ http://www.sample1.com
+ http://www.sample2.com
+ http://www.sample3.com
+
+
+caching methods
+a) request-caching
+ key for caching is
+  http://www.sample.com/.*
+
+b) origin-caching
+ key for caching is
+  http://www.sample1.com/.*
+  http://www.sample2.com/.*
+  http://www.sample3.com/.*
+
+What's the difference?
+ if no change or update config of proxy, there is no difference.
+
+a) should be slitely faster, since no url mapping would occur in case of cache
+b) should be roboust, it holds cache data par origin server basis.
+ i.e. in case of sample3 has changed, purge is needed for sample3.com, not for whole sample.com.
+
+
+
+

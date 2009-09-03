@@ -3,6 +3,7 @@ PYTHON = /usr/local/bin/python2.5
 NOSE = nosetests-2.5
 GAE_LIB_ROOT = /home/nori/Desktop/work/gae/google_appengine
 NAME = proxy
+USER = usr
 SRCDIR = src
 BUILDDIR = build
 
@@ -15,13 +16,17 @@ app: source
 source: build
 	cp $(SRCDIR)/*py $(BUILDDIR)
 	cp $(SRCDIR)/*yaml $(BUILDDIR)
+	$(PYTHON) util/mergeyaml.py $(SRCDIR)/app.yaml.template $(USER)/app.yaml > $(BUILDDIR)/app.yaml
+
 
 build:
 	-mkdir -p $(BUILDDIR)
 
-
 start_dev_server:
 	$(PYTHON) $(GAE_LIB_ROOT)/dev_appserver.py $(BUILDDIR)
+
+start_stubd:
+	$(PYTHON) tests/stubd.py
 
 test: build
 	$(NOSE) \
@@ -35,7 +40,7 @@ test: build
 clean:
 	-rm -rf $(BUILDDIR)
 
+install: app
+	$(PYTHON) $(GAE_LIB_ROOT)/appcfg.py update $(BUILDDIR)
 
-install:
-	$(PYTHON) $(GAE_LIB_ROOT)/appcfg.py update builds
 

@@ -3,3 +3,16 @@ Ugh!
 test cases depends my site, http://image.backgammonbase.com
 To be fixed.
 
+
+
+1) create dir usr under
+2) prepare app.yaml with "application" and "version'
+----
+application: <place your app id here>
+version: 1
+----
+
+3) make install. your 
+% make install
+authetication will occur.
+
