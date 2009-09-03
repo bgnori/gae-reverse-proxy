@@ -11,9 +11,8 @@ BUILDDIR = build
 all: app
 
 app: source
-	cp -r $(SRCDIR) $(BUILDDIR)/
 
-source: build
+source: build $(USER)
 	cp $(SRCDIR)/*py $(BUILDDIR)
 	cp $(SRCDIR)/*yaml $(BUILDDIR)
 	$(PYTHON) util/mergeyaml.py $(SRCDIR)/app.yaml.template $(USER)/app.yaml > $(BUILDDIR)/app.yaml
@@ -28,7 +27,7 @@ start_dev_server:
 start_stubd:
 	$(PYTHON) util/stubd.py localhost 8001
 
-test: build
+test: app
 	$(NOSE) \
     --with-gae \
     --gae-lib-root=$(GAE_LIB_ROOT) \

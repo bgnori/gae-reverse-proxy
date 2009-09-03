@@ -4,15 +4,44 @@ test cases depends my site, http://image.backgammonbase.com
 To be fixed.
 
 
+How to start:
+=============
+1) create dir usr under dir which contains Makefile.
 
-1) create dir usr under
-2) prepare app.yaml with "application" and "version'
-----
+2) prepare app.yaml under usr/ with "application" and "version' , change it as you want
+--(quote)--
 application: <place your app id here>
 version: 1
-----
+--(end of quote)--
 
-3) make install. your 
+3) build.
+% make app
+
+
+4) deploy or test, what ever you want.
+
+
+
+How to run locally:
+===================
+1) invoke dev_appserver with...
+% make start_dev_server
+
+
+How to deploy:
+==============
+1) make install.
 % make install
 authetication will occur.
+
+
+How to run test:
+================
+
+1) start stub server.
+% make start_stubd 
+it blocks. I recommend to open another terminal.
+
+2) evoke test.
+% make test
 
