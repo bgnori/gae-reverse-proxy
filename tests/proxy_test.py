@@ -25,7 +25,7 @@ from webtest import TestApp
 
 from google.appengine.ext import webapp
 from google.appengine.api import memcache
-from util import Epoch_to_rfc1123
+from epoch import Epoch_to_rfc1123
 from httphdr import REQUEST_HEADERS
 from proxy import HandlerFactory
 

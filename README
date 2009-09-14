@@ -32,7 +32,7 @@ How to deploy:
 ==============
 1) make install.
 % make install
-authetication will occur.
+authetication on google account will occur.
 
 
 How to run test:
@@ -63,5 +63,9 @@ something like:
 2) invoke crawler. it may teke long time. :P
 % make crawl
 
-3)
+3) then, let it guess web site structure.
+% make guess
+
+4) you will have "guess.yaml" in usr.
+
 

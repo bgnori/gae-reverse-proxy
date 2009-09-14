@@ -10,10 +10,8 @@ except ImportError:
 import os.path
 import sys
 
-dir, fname = os.path.split(sys.argv[1])
-assert fname
-
-f = open(os.path.join(dir, fname))
+dir = sys.argv[1]
+f = open(os.path.join(dir, 'crawl.yaml'))
 
 try:
   setting = load(f, Loader=Loader)
@@ -28,7 +26,6 @@ opener = urllib2.build_opener()
 opener.addheaders = [('User-agent', setting['ua'])]
 for site in setting['sites']:
   for u in site['url']:
-    print site['name'], u
     h = opener.open(u)
     print h.read(100)
     h.close()

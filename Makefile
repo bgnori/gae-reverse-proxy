@@ -30,8 +30,10 @@ test: build
 #    -x \
 
 crawl:
-	$(PYTHON) util/crawl.py $(USER)/crawl.yaml 
+	$(PYTHON) util/crawl.py $(USER)
 
+guess:
+	$(PYTHON) util/guess.py $(USER)/guess.yaml 
 
 clean:
 	-rm -rf build

@@ -24,7 +24,7 @@ from google.appengine.api import urlfetch
 from google.appengine.api import memcache
 
 from config import NETLOC, HOST, SCHEME
-from util import rfc1123_to_Epoch
+from epoch  import rfc1123_to_Epoch
 
 '''
   This list came from http://code.google.com/intl/ja/appengine/docs/webapp/responseclass.html#Disallowed_HTTP_Response_Headers
